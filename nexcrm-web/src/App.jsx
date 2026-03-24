@@ -9,6 +9,8 @@ import Leads from './pages/Leads'
 import LeadDetail from './pages/LeadDetail'
 import Activities from './pages/Activities'
 import Kanban from './pages/Kanban'
+import { lazy, Suspense } from 'react'
+const Reports = lazy(() => import('./pages/Reports'))
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -29,6 +31,7 @@ export default function App() {
         <Route path="leads/:id" element={<LeadDetail />} />
         <Route path="activities" element={<Activities />} />
         <Route path="kanban" element={<Kanban />} />
+        <Route path="reports" element={<Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"/></div>}><Reports /></Suspense>} />
       </Route>
     </Routes>
   )

@@ -5,6 +5,7 @@ import {
   FunnelIcon,
   ClipboardDocumentListIcon,
   ViewColumnsIcon,
+  ChartBarIcon,
 } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
 
@@ -13,7 +14,8 @@ const nav = [
   { to: '/contacts', label: 'Contacts', icon: UsersIcon },
   { to: '/leads', label: 'Leads', icon: FunnelIcon },
   { to: '/activities', label: 'Activities', icon: ClipboardDocumentListIcon },
-  { to: '/kanban', label: 'Pipeline', icon: ViewColumnsIcon },
+  { to: '/kanban',  label: 'Pipeline', icon: ViewColumnsIcon },
+  { to: '/reports', label: 'Reports',  icon: ChartBarIcon },
 ]
 
 export default function Sidebar() {
