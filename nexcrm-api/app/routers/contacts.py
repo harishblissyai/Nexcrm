@@ -1,5 +1,8 @@
+import csv
+import io
 from typing import Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -57,3 +60,58 @@ def delete_contact(
     current_user: User = Depends(get_current_user),
 ):
     svc.delete_contact(db, contact_id)
+
+
+@router.get("/export/csv")
+def export_contacts(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    contacts = svc.get_all_contacts(db)
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=["id", "name", "email", "phone", "company", "notes", "created_at"])
+    writer.writeheader()
+    for c in contacts:
+        writer.writerow({
+            "id": c.id, "name": c.name, "email": c.email or "",
+            "phone": c.phone or "", "company": c.company or "",
+            "notes": c.notes or "", "created_at": c.created_at.isoformat(),
+        })
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=contacts.csv"},
+    )
+
+
+@router.post("/import/csv")
+async def import_contacts(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only CSV files are accepted")
+    content = await file.read()
+    try:
+        text = content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = content.decode("latin-1")
+    reader = csv.DictReader(io.StringIO(text))
+    imported, errors = 0, []
+    for i, row in enumerate(reader, start=2):
+        name = (row.get("name") or row.get("Name") or "").strip()
+        if not name:
+            errors.append(f"Row {i}: missing name")
+            continue
+        data = ContactCreate(
+            name=name,
+            email=(row.get("email") or row.get("Email") or "").strip() or None,
+            phone=(row.get("phone") or row.get("Phone") or "").strip() or None,
+            company=(row.get("company") or row.get("Company") or "").strip() or None,
+            notes=(row.get("notes") or row.get("Notes") or "").strip() or None,
+        )
+        svc.create_contact(db, data, current_user.id)
+        imported += 1
+    return {"imported": imported, "errors": errors}

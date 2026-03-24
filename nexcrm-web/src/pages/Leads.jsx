@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, PencilIcon, TrashIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import { leadsApi } from '../api/leads'
 import { contactsApi } from '../api/contacts'
 import DataTable from '../components/DataTable'
@@ -75,9 +75,14 @@ export default function Leads() {
           <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
           <p className="text-sm text-gray-500">{data.total} total</p>
         </div>
-        <button className="btn-primary" onClick={() => { setEditing(null); setShowModal(true) }}>
-          <PlusIcon className="h-4 w-4" /> New Lead
-        </button>
+        <div className="flex gap-2">
+          <button className="btn-secondary" onClick={() => leadsApi.exportCsv()}>
+            <ArrowDownTrayIcon className="h-4 w-4" /> Export CSV
+          </button>
+          <button className="btn-primary" onClick={() => { setEditing(null); setShowModal(true) }}>
+            <PlusIcon className="h-4 w-4" /> New Lead
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 flex-wrap">

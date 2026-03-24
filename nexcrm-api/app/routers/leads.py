@@ -1,5 +1,8 @@
+import csv
+import io
 from typing import Optional
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -68,3 +71,26 @@ def delete_lead(
     current_user: User = Depends(get_current_user),
 ):
     svc.delete_lead(db, lead_id)
+
+
+@router.get("/export/csv")
+def export_leads(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    leads = svc.get_all_leads(db)
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=["id", "title", "status", "value", "notes", "created_at"])
+    writer.writeheader()
+    for l in leads:
+        writer.writerow({
+            "id": l.id, "title": l.title, "status": l.status.value,
+            "value": l.value or "", "notes": l.notes or "",
+            "created_at": l.created_at.isoformat(),
+        })
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=leads.csv"},
+    )

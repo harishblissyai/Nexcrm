@@ -51,3 +51,7 @@ def delete_contact(db: Session, contact_id: int) -> None:
     contact = get_contact(db, contact_id)
     db.delete(contact)
     db.commit()
+
+
+def get_all_contacts(db: Session) -> list:
+    return db.query(Contact).order_by(Contact.created_at.desc()).all()

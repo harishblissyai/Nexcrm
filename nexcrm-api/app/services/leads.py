@@ -54,6 +54,10 @@ def delete_lead(db: Session, lead_id: int) -> None:
     db.commit()
 
 
+def get_all_leads(db: Session) -> list:
+    return db.query(Lead).order_by(Lead.created_at.desc()).all()
+
+
 def search_leads(db: Session, term: str) -> list[Lead]:
     t = f"%{term}%"
     return db.query(Lead).filter(

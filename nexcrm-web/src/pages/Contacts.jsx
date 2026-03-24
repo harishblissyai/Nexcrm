@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon, ArrowUpTrayIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import { contactsApi } from '../api/contacts'
 import DataTable from '../components/DataTable'
 import Modal from '../components/Modal'
 import ContactForm from '../components/ContactForm'
+import ImportModal from '../components/ImportModal'
 import toast from 'react-hot-toast'
 
 export default function Contacts() {
@@ -14,6 +15,7 @@ export default function Contacts() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [showImport, setShowImport] = useState(false)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
 
@@ -83,9 +85,17 @@ export default function Contacts() {
           <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
           <p className="text-sm text-gray-500">{data.total} total</p>
         </div>
-        <button className="btn-primary" onClick={() => { setEditing(null); setShowModal(true) }}>
-          <PlusIcon className="h-4 w-4" /> New Contact
-        </button>
+        <div className="flex gap-2">
+          <button className="btn-secondary" onClick={() => contactsApi.exportCsv()}>
+            <ArrowDownTrayIcon className="h-4 w-4" /> Export CSV
+          </button>
+          <button className="btn-secondary" onClick={() => setShowImport(true)}>
+            <ArrowUpTrayIcon className="h-4 w-4" /> Import CSV
+          </button>
+          <button className="btn-primary" onClick={() => { setEditing(null); setShowModal(true) }}>
+            <PlusIcon className="h-4 w-4" /> New Contact
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSearch} className="flex gap-2 max-w-sm">
@@ -102,6 +112,20 @@ export default function Contacts() {
         <Modal title={editing ? 'Edit Contact' : 'New Contact'} onClose={() => { setShowModal(false); setEditing(null) }}>
           <ContactForm initial={editing ?? {}} onSubmit={handleSave} onCancel={() => { setShowModal(false); setEditing(null) }} loading={saving} />
         </Modal>
+      )}
+
+      {showImport && (
+        <ImportModal
+          entityName="Contacts"
+          templateHeaders={['name', 'email', 'phone', 'company', 'notes']}
+          onImport={async (file) => {
+            const res = await contactsApi.importCsv(file)
+            toast.success(`${res.imported} contacts imported`)
+            load()
+            return res
+          }}
+          onClose={() => setShowImport(false)}
+        />
       )}
     </div>
   )
