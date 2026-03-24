@@ -25,6 +25,7 @@ export const contactsApi = {
         URL.revokeObjectURL(objectUrl)
       })
   },
+  timeline: (id) => client.get(`/contacts/${id}/timeline`),
   importCsv: (file) => {
     const form = new FormData()
     form.append('file', file)
