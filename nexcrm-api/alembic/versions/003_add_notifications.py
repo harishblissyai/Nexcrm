@@ -14,6 +14,9 @@ depends_on = None
 
 
 def upgrade():
+    bind = op.get_bind()
+    if 'notifications' in sa.inspect(bind).get_table_names():
+        return
     op.create_table(
         'notifications',
         sa.Column('id', sa.Integer(), primary_key=True, index=True),

@@ -14,9 +14,13 @@ depends_on = None
 
 
 def upgrade():
+    bind = op.get_bind()
+    cols = [c['name'] for c in sa.inspect(bind).get_columns('activities')]
     with op.batch_alter_table('activities') as batch_op:
-        batch_op.add_column(sa.Column('due_date', sa.DateTime(), nullable=True))
-        batch_op.add_column(sa.Column('is_done', sa.Boolean(), nullable=False, server_default='0'))
+        if 'due_date' not in cols:
+            batch_op.add_column(sa.Column('due_date', sa.DateTime(), nullable=True))
+        if 'is_done' not in cols:
+            batch_op.add_column(sa.Column('is_done', sa.Boolean(), nullable=False, server_default='0'))
 
 
 def downgrade():

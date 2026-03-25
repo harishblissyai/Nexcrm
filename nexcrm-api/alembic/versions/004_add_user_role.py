@@ -14,10 +14,13 @@ depends_on = None
 
 
 def upgrade():
-    with op.batch_alter_table('users') as batch_op:
-        batch_op.add_column(sa.Column('role', sa.String(), nullable=False, server_default='member'))
+    bind = op.get_bind()
+    cols = [c['name'] for c in sa.inspect(bind).get_columns('users')]
+    if 'role' not in cols:
+        with op.batch_alter_table('users') as batch_op:
+            batch_op.add_column(sa.Column('role', sa.String(), nullable=False, server_default='member'))
 
-    # Promote the first user (id=1) to admin
+    # Promote the first registered user to admin
     op.execute("UPDATE users SET role = 'admin' WHERE id = (SELECT MIN(id) FROM users)")
 
 
