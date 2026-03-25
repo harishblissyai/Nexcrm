@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import Base, engine
-from app.routers import auth, contacts, leads, activities, dashboard, search, reports, notifications
+from app.routers import auth, contacts, leads, activities, dashboard, search, reports, notifications, admin
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
@@ -31,6 +31,7 @@ app.include_router(dashboard.router, prefix=API_PREFIX)
 app.include_router(search.router, prefix=API_PREFIX)
 app.include_router(reports.router, prefix=API_PREFIX)
 app.include_router(notifications.router, prefix=API_PREFIX)
+app.include_router(admin.router, prefix=API_PREFIX)
 
 
 @app.get("/health")

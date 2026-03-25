@@ -9,10 +9,13 @@ from app.schemas.auth import RegisterRequest, LoginRequest
 def register_user(db: Session, data: RegisterRequest) -> User:
     if db.query(User).filter(User.email == data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
+    # First user becomes admin automatically
+    is_first = db.query(User).count() == 0
     user = User(
         email=data.email,
         full_name=data.full_name,
         hashed_password=hash_password(data.password),
+        role="admin" if is_first else "member",
     )
     db.add(user)
     db.commit()
