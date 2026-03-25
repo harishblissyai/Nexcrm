@@ -69,24 +69,24 @@ export default function Contacts() {
 
   const columns = [
     { key: 'name', label: 'Name', render: r => <button onClick={() => navigate(`/contacts/${r.id}`)} className="font-medium text-primary-600 hover:underline text-left">{r.name}</button> },
-    { key: 'email', label: 'Email', render: r => r.email || <span className="text-gray-400">—</span> },
-    { key: 'phone', label: 'Phone', render: r => r.phone || <span className="text-gray-400">—</span> },
-    { key: 'company', label: 'Company', render: r => r.company || <span className="text-gray-400">—</span> },
-    { key: 'tags', label: 'Tags', render: r => r.tags?.length ? <div className="flex flex-wrap gap-1">{r.tags.map(t => <TagBadge key={t} tag={t} />)}</div> : <span className="text-gray-400">—</span> },
+    { key: 'email', label: 'Email', render: r => r.email || <span className="text-slate-400">—</span> },
+    { key: 'phone', label: 'Phone', render: r => r.phone || <span className="text-slate-400">—</span> },
+    { key: 'company', label: 'Company', render: r => r.company || <span className="text-slate-400">—</span> },
+    { key: 'tags', label: 'Tags', render: r => r.tags?.length ? <div className="flex flex-wrap gap-1">{r.tags.map(t => <TagBadge key={t} tag={t} />)}</div> : <span className="text-slate-400">—</span> },
     { key: 'actions', label: '', render: r => (
       <div className="flex gap-1 justify-end">
         <button onClick={() => { setEditing(r); setShowModal(true) }} className="btn-secondary p-1.5"><PencilIcon className="h-4 w-4" /></button>
-        <button onClick={() => handleDelete(r.id)} className="btn p-1.5 text-red-500 hover:bg-red-50 border border-gray-300 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
+        <button onClick={() => handleDelete(r.id)} className="btn p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 border border-slate-200 dark:border-slate-700 rounded-xl"><TrashIcon className="h-4 w-4" /></button>
       </div>
     )},
   ]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-slide-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
-          <p className="text-sm text-gray-500">{data.total} total</p>
+          <h1 className="page-title">Contacts</h1>
+          <p className="page-subtitle">{data.total} total</p>
         </div>
         <div className="flex gap-2">
           <button className="btn-secondary" onClick={() => contactsApi.exportCsv()}>
@@ -103,7 +103,7 @@ export default function Contacts() {
 
       <form onSubmit={handleSearch} className="flex flex-wrap gap-2 items-center">
         <div className="relative flex-1">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search contacts…" className="input pl-9" />
         </div>
         <button type="submit" className="btn-secondary">Search</button>
@@ -114,7 +114,7 @@ export default function Contacts() {
           className="input w-40 text-sm"
         />
         {tagFilter && (
-          <button onClick={() => { setTagFilter(''); setPage(1) }} className="text-xs text-gray-500 hover:text-gray-700 underline">
+          <button onClick={() => { setTagFilter(''); setPage(1) }} className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 underline">
             Clear tag
           </button>
         )}

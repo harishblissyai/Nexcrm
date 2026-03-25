@@ -10,21 +10,21 @@ import ActivityForm from '../components/ActivityForm'
 import toast from 'react-hot-toast'
 
 const TYPE_COLORS = {
-  Call: 'bg-blue-100 text-blue-700',
-  Email: 'bg-purple-100 text-purple-700',
-  Meeting: 'bg-yellow-100 text-yellow-700',
-  Note: 'bg-gray-100 text-gray-700',
+  Call:    'bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+  Email:   'bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+  Meeting: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  Note:    'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
 }
 const ACTIVITY_ICONS = { Call: '📞', Email: '✉️', Meeting: '🤝', Note: '📝' }
 
 function DueDateCell({ row }) {
-  if (!row.due_date) return <span className="text-gray-400">—</span>
+  if (!row.due_date) return <span className="text-slate-400">—</span>
   const due = new Date(row.due_date)
   const now = new Date()
   const isOverdue = !row.is_done && due < now
   const isToday = !row.is_done && due >= new Date(now.toDateString()) && due < new Date(new Date(now.toDateString()).getTime() + 86400000)
   return (
-    <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-red-600 font-semibold' : isToday ? 'text-yellow-600 font-semibold' : 'text-gray-500'}`}>
+    <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-rose-600 font-semibold' : isToday ? 'text-amber-600 font-semibold' : 'text-slate-500'}`}>
       {isOverdue && <ExclamationCircleIcon className="h-3.5 w-3.5" />}
       {due.toLocaleDateString()}
     </span>
@@ -79,16 +79,16 @@ export default function Activities() {
   }
 
   const getContactName = (id) => contacts.find(c => c.id === id)?.name
-  const getLeadTitle = (id) => leads.find(l => l.id === id)?.title
+  const getLeadTitle  = (id) => leads.find(l => l.id === id)?.title
 
   const now = new Date()
   const todayStart = new Date(now.toDateString())
-  const todayEnd = new Date(todayStart.getTime() + 86400000)
+  const todayEnd   = new Date(todayStart.getTime() + 86400000)
 
   const filteredItems = data.items.filter(r => {
     if (filter === 'overdue') return r.due_date && new Date(r.due_date) < now && !r.is_done
-    if (filter === 'today') return r.due_date && new Date(r.due_date) >= todayStart && new Date(r.due_date) < todayEnd && !r.is_done
-    if (filter === 'done') return r.is_done
+    if (filter === 'today')   return r.due_date && new Date(r.due_date) >= todayStart && new Date(r.due_date) < todayEnd && !r.is_done
+    if (filter === 'done')    return r.is_done
     return true
   })
 
@@ -96,50 +96,54 @@ export default function Activities() {
     {
       key: 'status', label: '', render: r => (
         r.is_done
-          ? <CheckCircleSolid className="h-5 w-5 text-green-400" />
-          : <button onClick={() => handleMarkDone(r.id)} className="text-gray-300 hover:text-green-500 transition-colors"><CheckCircleSolid className="h-5 w-5" /></button>
+          ? <CheckCircleSolid className="h-5 w-5 text-emerald-400" />
+          : <button onClick={() => handleMarkDone(r.id)} className="text-slate-300 hover:text-emerald-500 transition-colors"><CheckCircleSolid className="h-5 w-5" /></button>
       )
     },
-    { key: 'type', label: 'Type', render: r => <span className={`badge ${TYPE_COLORS[r.type]} ${r.is_done ? 'opacity-50' : ''}`}>{ACTIVITY_ICONS[r.type]} {r.type}</span> },
-    { key: 'subject', label: 'Subject', render: r => <span className={`font-medium ${r.is_done ? 'line-through text-gray-400' : ''}`}>{r.subject}</span> },
-    { key: 'contact', label: 'Contact', render: r => r.contact_id ? <span className="text-sm text-gray-600">{getContactName(r.contact_id) || `#${r.contact_id}`}</span> : <span className="text-gray-400">—</span> },
-    { key: 'due_date', label: 'Due', render: r => <DueDateCell row={r} /> },
-    { key: 'created_at', label: 'Created', render: r => <span className="text-gray-500 text-xs">{new Date(r.created_at).toLocaleDateString()}</span> },
+    { key: 'type',    label: 'Type',    render: r => <span className={`badge ${TYPE_COLORS[r.type]} ${r.is_done ? 'opacity-50' : ''}`}>{ACTIVITY_ICONS[r.type]} {r.type}</span> },
+    { key: 'subject', label: 'Subject', render: r => <span className={`font-medium ${r.is_done ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}`}>{r.subject}</span> },
+    { key: 'contact', label: 'Contact', render: r => r.contact_id ? <span className="text-sm text-slate-600 dark:text-slate-400">{getContactName(r.contact_id) || `#${r.contact_id}`}</span> : <span className="text-slate-400">—</span> },
+    { key: 'due_date',   label: 'Due',     render: r => <DueDateCell row={r} /> },
+    { key: 'created_at', label: 'Created', render: r => <span className="text-slate-500 dark:text-slate-400 text-xs">{new Date(r.created_at).toLocaleDateString()}</span> },
     {
       key: 'actions', label: '', render: r => (
         <div className="flex gap-1 justify-end">
           <button onClick={() => { setEditing(r); setShowModal(true) }} className="btn-secondary p-1.5"><PencilIcon className="h-4 w-4" /></button>
-          <button onClick={() => handleDelete(r.id)} className="btn p-1.5 text-red-500 hover:bg-red-50 border border-gray-300 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
+          <button onClick={() => handleDelete(r.id)} className="btn p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 border border-slate-200 dark:border-slate-700 rounded-xl"><TrashIcon className="h-4 w-4" /></button>
         </div>
       )
     },
   ]
 
   const FILTERS = [
-    { key: 'all', label: 'All' },
+    { key: 'all',     label: 'All' },
     { key: 'overdue', label: 'Overdue' },
-    { key: 'today', label: 'Due Today' },
-    { key: 'done', label: 'Done' },
+    { key: 'today',   label: 'Due Today' },
+    { key: 'done',    label: 'Done' },
   ]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-slide-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Activities</h1>
-          <p className="text-sm text-gray-500">{data.total} total</p>
+          <h1 className="page-title">Activities</h1>
+          <p className="page-subtitle">{data.total} total</p>
         </div>
         <button className="btn-primary" onClick={() => { setEditing(null); setShowModal(true) }}>
           <PlusIcon className="h-4 w-4" /> Log Activity
         </button>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {FILTERS.map(f => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === f.key ? 'bg-primary-600 text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+              filter === f.key
+                ? 'bg-primary-600 text-white border-primary-600 shadow-sm'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary-300 hover:text-primary-600'
+            }`}
           >
             {f.label}
           </button>

@@ -15,35 +15,32 @@ import ContactTimeline from '../components/ContactTimeline'
 import toast from 'react-hot-toast'
 
 const STATUS_COLORS = {
-  New: 'bg-gray-100 text-gray-700',
-  Contacted: 'bg-blue-100 text-blue-700',
-  Qualified: 'bg-yellow-100 text-yellow-700',
-  ClosedWon: 'bg-green-100 text-green-700',
-  ClosedLost: 'bg-red-100 text-red-700',
+  New:        'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+  Contacted:  'bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+  Qualified:  'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  ClosedWon:  'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  ClosedLost: 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
 }
 
 export default function ContactDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [contact, setContact]     = useState(null)
-  const [timeline, setTimeline]   = useState([])
-  const [leads, setLeads]         = useState([])
+  const [contact, setContact]         = useState(null)
+  const [timeline, setTimeline]       = useState([])
+  const [leads, setLeads]             = useState([])
   const [linkedLeads, setLinkedLeads] = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [tlLoading, setTlLoading] = useState(true)
-  const [showEdit, setShowEdit]   = useState(false)
+  const [loading, setLoading]         = useState(true)
+  const [tlLoading, setTlLoading]     = useState(true)
+  const [showEdit, setShowEdit]       = useState(false)
   const [showActivity, setShowActivity] = useState(false)
-  const [saving, setSaving]       = useState(false)
-  const [tab, setTab]             = useState('timeline') // 'timeline' | 'leads'
+  const [saving, setSaving]           = useState(false)
+  const [tab, setTab]                 = useState('timeline') // 'timeline' | 'leads'
 
-  const loadContact = () =>
-    contactsApi.get(id).then(setContact)
+  const loadContact  = () => contactsApi.get(id).then(setContact)
 
   const loadTimeline = () => {
     setTlLoading(true)
-    contactsApi.timeline(id)
-      .then(setTimeline)
-      .finally(() => setTlLoading(false))
+    contactsApi.timeline(id).then(setTimeline).finally(() => setTlLoading(false))
   }
 
   const loadLeads = () =>
@@ -54,8 +51,7 @@ export default function ContactDetail() {
 
   const load = () => {
     setLoading(true)
-    Promise.all([loadContact(), loadLeads()])
-      .finally(() => setLoading(false))
+    Promise.all([loadContact(), loadLeads()]).finally(() => setLoading(false))
     loadTimeline()
   }
 
@@ -91,27 +87,28 @@ export default function ContactDetail() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-48">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      <div className="h-8 w-8 rounded-full border-[3px] border-primary-500/20 border-t-primary-500 animate-spin" />
     </div>
   )
-  if (!contact) return <p className="text-gray-500 p-6">Contact not found.</p>
+  if (!contact) return <p className="text-slate-500 p-6">Contact not found.</p>
 
   const initials = contact.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="max-w-4xl space-y-6 animate-slide-up">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link to="/contacts" className="btn-secondary p-2 shrink-0">
           <ArrowLeftIcon className="h-4 w-4" />
         </Link>
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-11 h-11 rounded-full bg-primary-600 flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-sm">{initials}</span>
+          <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-sm"
+            style={{ background: 'linear-gradient(135deg, #818cf8, #4f46e5)' }}>
+            {initials}
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl font-bold text-gray-900 truncate">{contact.name}</h1>
-            {contact.company && <p className="text-sm text-gray-500 truncate">{contact.company}</p>}
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 truncate">{contact.name}</h1>
+            {contact.company && <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{contact.company}</p>}
           </div>
         </div>
         <button onClick={() => setShowEdit(true)} className="btn-secondary shrink-0">
@@ -123,66 +120,64 @@ export default function ContactDetail() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left panel: contact info */}
+        {/* Left panel */}
         <div className="space-y-4">
           <div className="card p-4 space-y-3">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Contact Info</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Contact Info</h3>
             {contact.email && (
               <div className="flex items-center gap-2">
-                <EnvelopeIcon className="h-4 w-4 text-gray-400 shrink-0" />
+                <EnvelopeIcon className="h-4 w-4 text-slate-400 shrink-0" />
                 <a href={`mailto:${contact.email}`} className="text-sm text-primary-600 hover:underline truncate">{contact.email}</a>
               </div>
             )}
             {contact.phone && (
               <div className="flex items-center gap-2">
-                <PhoneIcon className="h-4 w-4 text-gray-400 shrink-0" />
-                <a href={`tel:${contact.phone}`} className="text-sm text-gray-700">{contact.phone}</a>
+                <PhoneIcon className="h-4 w-4 text-slate-400 shrink-0" />
+                <a href={`tel:${contact.phone}`} className="text-sm text-slate-700 dark:text-slate-300">{contact.phone}</a>
               </div>
             )}
             {contact.company && (
               <div className="flex items-center gap-2">
-                <BuildingOfficeIcon className="h-4 w-4 text-gray-400 shrink-0" />
-                <span className="text-sm text-gray-700 truncate">{contact.company}</span>
+                <BuildingOfficeIcon className="h-4 w-4 text-slate-400 shrink-0" />
+                <span className="text-sm text-slate-700 dark:text-slate-300 truncate">{contact.company}</span>
               </div>
             )}
             {!contact.email && !contact.phone && !contact.company && (
-              <p className="text-xs text-gray-400">No contact details added.</p>
+              <p className="text-xs text-slate-400">No contact details added.</p>
             )}
           </div>
 
           {contact.notes && (
             <div className="card p-4">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Notes</h3>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{contact.notes}</p>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Notes</h3>
+              <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{contact.notes}</p>
             </div>
           )}
 
-          {/* Quick stats */}
           <div className="card p-4 grid grid-cols-2 gap-3">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{timeline.filter(e => e.kind === 'activity').length}</p>
-              <p className="text-xs text-gray-400 mt-0.5">Activities</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{timeline.filter(e => e.kind === 'activity').length}</p>
+              <p className="text-xs text-slate-400 mt-0.5">Activities</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{linkedLeads.length}</p>
-              <p className="text-xs text-gray-400 mt-0.5">Leads</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{linkedLeads.length}</p>
+              <p className="text-xs text-slate-400 mt-0.5">Leads</p>
             </div>
           </div>
         </div>
 
-        {/* Right panel: tabs */}
+        {/* Right panel */}
         <div className="md:col-span-2 card p-5">
-          {/* Tab bar */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
               {['timeline', 'leads'].map(t => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${
+                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all capitalize ${
                     tab === t
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                   }`}
                 >
                   {t === 'timeline' ? `Timeline (${timeline.length})` : `Leads (${linkedLeads.length})`}
@@ -196,7 +191,6 @@ export default function ContactDetail() {
             )}
           </div>
 
-          {/* Timeline tab */}
           {tab === 'timeline' && (
             <ContactTimeline
               events={timeline}
@@ -205,12 +199,11 @@ export default function ContactDetail() {
             />
           )}
 
-          {/* Leads tab */}
           {tab === 'leads' && (
             <div>
               {linkedLeads.length === 0 ? (
                 <div className="text-center py-10">
-                  <p className="text-sm text-gray-400">No leads linked to this contact.</p>
+                  <p className="text-sm text-slate-400">No leads linked to this contact.</p>
                   <Link to="/leads" className="mt-2 text-sm text-primary-600 hover:underline font-medium block">
                     Create a lead →
                   </Link>
@@ -221,15 +214,15 @@ export default function ContactDetail() {
                     <li key={lead.id}>
                       <Link
                         to={`/leads/${lead.id}`}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors group"
+                        className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50/50 dark:hover:bg-primary-950/30 transition-all group"
                       >
                         <div>
-                          <p className="text-sm font-medium text-gray-900 group-hover:text-primary-700">{lead.title}</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-100 group-hover:text-primary-700 dark:group-hover:text-primary-400">{lead.title}</p>
                           {lead.value && (
-                            <p className="text-xs text-gray-500 mt-0.5">${Number(lead.value).toLocaleString()}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${Number(lead.value).toLocaleString()}</p>
                           )}
                         </div>
-                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_COLORS[lead.status]}`}>
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_COLORS[lead.status]}`}>
                           {lead.status}
                         </span>
                       </Link>
