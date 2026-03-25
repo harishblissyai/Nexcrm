@@ -9,6 +9,7 @@ class ActivityCreate(BaseModel):
     type: ActivityType
     subject: str
     body: Optional[str] = None
+    due_date: Optional[datetime] = None
     contact_id: Optional[int] = None
     lead_id: Optional[int] = None
 
@@ -17,6 +18,8 @@ class ActivityUpdate(BaseModel):
     type: Optional[ActivityType] = None
     subject: Optional[str] = None
     body: Optional[str] = None
+    due_date: Optional[datetime] = None
+    is_done: Optional[bool] = None
     contact_id: Optional[int] = None
     lead_id: Optional[int] = None
 
@@ -26,6 +29,8 @@ class ActivityOut(BaseModel):
     type: ActivityType
     subject: str
     body: Optional[str] = None
+    due_date: Optional[datetime] = None
+    is_done: bool = False
     contact_id: Optional[int] = None
     lead_id: Optional[int] = None
     created_by: int

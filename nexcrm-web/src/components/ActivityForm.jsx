@@ -2,11 +2,19 @@ import { useState } from 'react'
 
 const TYPES = ['Call', 'Email', 'Meeting', 'Note']
 
+function toLocalDatetimeValue(isoStr) {
+  if (!isoStr) return ''
+  const d = new Date(isoStr)
+  const pad = n => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 export default function ActivityForm({ initial = {}, contacts = [], leads = [], onSubmit, onCancel, loading }) {
   const [form, setForm] = useState({
     type: initial.type ?? 'Call',
     subject: initial.subject ?? '',
     body: initial.body ?? '',
+    due_date: toLocalDatetimeValue(initial.due_date),
     contact_id: initial.contact_id ?? '',
     lead_id: initial.lead_id ?? '',
   })
@@ -24,6 +32,7 @@ export default function ActivityForm({ initial = {}, contacts = [], leads = [], 
     if (!validate()) return
     onSubmit({
       ...form,
+      due_date: form.due_date ? new Date(form.due_date).toISOString() : null,
       contact_id: form.contact_id ? Number(form.contact_id) : null,
       lead_id: form.lead_id ? Number(form.lead_id) : null,
     })
@@ -63,8 +72,17 @@ export default function ActivityForm({ initial = {}, contacts = [], leads = [], 
         </div>
       </div>
       <div>
+        <label className="label">Due Date</label>
+        <input
+          type="datetime-local"
+          value={form.due_date}
+          onChange={set('due_date')}
+          className="input"
+        />
+      </div>
+      <div>
         <label className="label">Notes / Body</label>
-        <textarea value={form.body} onChange={set('body')} rows={4} placeholder="Details…" className="input resize-none" />
+        <textarea value={form.body} onChange={set('body')} rows={3} placeholder="Details…" className="input resize-none" />
       </div>
       <div className="flex gap-3 pt-2">
         <button type="submit" className="btn-primary flex-1" disabled={loading}>

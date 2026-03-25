@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -8,6 +9,7 @@ from app.models.contact import Contact
 from app.models.lead import Lead, LeadStatus
 from app.models.user import User
 from app.schemas.activity import ActivityOut
+from app.services.activities import get_overdue_activities, get_due_today_activities
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -31,9 +33,16 @@ def get_stats(
         .all()
     )
 
+    overdue = get_overdue_activities(db)
+    due_today = get_due_today_activities(db)
+
     return {
         "total_contacts": total_contacts,
         "total_leads": total_leads,
         "leads_by_status": leads_by_status,
         "recent_activities": [ActivityOut.model_validate(a) for a in recent],
+        "overdue_count": len(overdue),
+        "due_today_count": len(due_today),
+        "overdue_tasks": [ActivityOut.model_validate(a) for a in overdue[:5]],
+        "due_today_tasks": [ActivityOut.model_validate(a) for a in due_today[:5]],
     }
