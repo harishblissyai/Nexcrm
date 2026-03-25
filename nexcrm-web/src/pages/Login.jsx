@@ -40,7 +40,7 @@ export default function Login() {
   const set = (key) => (e) => { setForm(f => ({ ...f, [key]: e.target.value })); setErrors(er => ({ ...er, [key]: '' })) }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-900 to-primary-700 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-900 to-primary-700 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Nex<span className="text-primary-300">CRM</span></h1>
@@ -48,7 +48,7 @@ export default function Login() {
         </div>
 
         <div className="card p-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
             {mode === 'login' ? 'Sign in to your account' : 'Create an account'}
           </h2>
 

@@ -36,6 +36,29 @@ def get_stats(
     overdue = get_overdue_activities(db)
     due_today = get_due_today_activities(db)
 
+    # Fire overdue notifications (only if not already notified today)
+    if overdue:
+        from app.models.notification import Notification
+        from datetime import date
+        today = date.today()
+        for act in overdue:
+            exists = db.query(Notification).filter(
+                Notification.entity_type == "activity",
+                Notification.entity_id == act.id,
+                Notification.type == "overdue",
+            ).first()
+            if not exists:
+                notif = Notification(
+                    user_id=current_user.id,
+                    title="Overdue activity",
+                    message=f'"{act.subject}" is past its due date',
+                    type="overdue",
+                    entity_type="activity",
+                    entity_id=act.id,
+                )
+                db.add(notif)
+        db.commit()
+
     return {
         "total_contacts": total_contacts,
         "total_leads": total_leads,

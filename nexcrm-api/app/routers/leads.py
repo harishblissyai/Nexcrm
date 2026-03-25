@@ -62,7 +62,7 @@ def update_lead_status(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return svc.update_lead_status(db, lead_id, data.status)
+    return svc.update_lead_status(db, lead_id, data.status, current_user.id)
 
 
 @router.delete("/{lead_id}", status_code=204)

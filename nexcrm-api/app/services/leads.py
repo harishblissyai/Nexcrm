@@ -42,11 +42,25 @@ def update_lead(db: Session, lead_id: int, data: LeadUpdate) -> Lead:
     return lead
 
 
-def update_lead_status(db: Session, lead_id: int, status: LeadStatus) -> Lead:
+def update_lead_status(db: Session, lead_id: int, status: LeadStatus, user_id: int | None = None) -> Lead:
     lead = get_lead(db, lead_id)
+    old_status = lead.status
     lead.status = status
     db.commit()
     db.refresh(lead)
+    # Create notification for status change
+    if user_id and old_status != status:
+        from app.models.notification import Notification
+        notif = Notification(
+            user_id=user_id,
+            title="Lead status changed",
+            message=f'"{lead.title}" moved from {old_status.value} → {status.value}',
+            type="lead_status",
+            entity_type="lead",
+            entity_id=lead.id,
+        )
+        db.add(notif)
+        db.commit()
     return lead
 
 
